@@ -1,14 +1,8 @@
 import os
-import sys
 import stockfish
 import tkinter as tk
 from itertools import product
 from PIL import Image, ImageTk
-
-__DEBUG__ = False
-
-if len(sys.argv) > 1:
-    __DEBUG__ = True
 
 
 stockfish_path = os.path.join(os.path.dirname(
@@ -35,14 +29,6 @@ class ChessBoard:
         select_color_code: str = "#cad549",
         mark_color_code: str = "#ff3232"
     ):
-        if __DEBUG__:
-            print("[INFO] ChessBoard class instance created")
-            print("\tasset_loc:", asset_location)
-            print("\ttile_size:", tile_size)
-            print("\twhite:", white_color_code)
-            print("\tblack:", black_color_code)
-            print("\tstart flipped?", start_flipped)
-
         self.root = root
 
         self.assets_path = asset_location
@@ -100,21 +86,14 @@ class ChessBoard:
         pieces = ["wk", "wq", "wr", "wn", "wb",
                   "wp", "bk", "bq", "br", "bn", "bb", "bp"]
 
-        if __DEBUG__:
-            print(f"[INFO] Scanning {self.assets_path.capitalize()}...")
         for path, _, files in os.walk(self.assets_path):
             for file in files:
-                if __DEBUG__:
-                    print("\tFound:", file)
                 filename = file.split(".")[0]
                 if filename.lower() in pieces:
                     piece_files.update(
                         {filename.lower(): os.path.join(path, file)})
         piece_images = {}
 
-        if __DEBUG__:
-            print("     Done")
-            print("[INFO] Processing assets...", end=" ")
         for name, path in piece_files.items():
             img = Image.open(path)
             img_rszd = img.resize(
@@ -123,8 +102,6 @@ class ChessBoard:
             piece_images.update({name.upper(): img_tk})
 
         self.root.piece_images = piece_images
-        if __DEBUG__:
-            print("Done")
 
         return piece_images
 
