@@ -1,0 +1,279 @@
+import os
+import sys
+import stockfish
+import tkinter as tk
+from itertools import product
+from PIL import Image, ImageTk
+
+__DEBUG__ = False
+
+if len(sys.argv) > 1:
+    __DEBUG__ = True
+
+
+assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+save_dir = os.path.join(os.path.dirname(__file__), "games")
+icon_path = os.path.join(assets_dir, "icon.ico")
+
+
+class ChessBoard:
+    def __init__(
+        self,
+        root: tk.Tk,
+        asset_location: os.PathLike,
+        tile_size: int = 60,
+        start_flipped: bool = False,
+        white_color_code: str = "#ffcf9f",
+        black_color_code: str = "#d28c45",
+        select_color_code: str = "#cad549",
+        mark_color_code: str = "#ff3232"
+    ):
+        if __DEBUG__:
+            print("[INFO] ChessBoard class instance created")
+            print("\tasset_loc:", asset_location)
+            print("\ttile_size:", tile_size)
+            print("\twhite:", white_color_code)
+            print("\tblack:", black_color_code)
+            print("\tstart flipped?", start_flipped)
+
+        self.root = root
+
+        self.assets_path = asset_location
+
+        self.canvas = tk.Canvas(root, width=8*tile_size, height=8*tile_size)
+        self.canvas.pack(side="left")
+
+        self.tile_size = tile_size
+
+        self._white = white_color_code
+        self._black = black_color_code
+        self._colors = (self._white, self._black)
+
+        self._select = select_color_code
+        self._mark = mark_color_code
+
+        self.selected_cell = None
+        self.marked_cells = []
+
+        self._flipped = False
+
+        self.board = [
+            ["BR", "BN", "BB", "BQ", "BK", "BB", "BN", "BR"],
+            ["BP", "BP", "BP", "BP", "BP", "BP", "BP", "BP"],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["BP", "BP", "BP", "  ", "  ", "  ", "  ", "  "],
+            ["WP", "WP", "WP", "WP", "WP", "WP", "WP", "WP"],
+            ["WR", "WN", "WB", "WQ", "WK", "WB", "WN", "WR"]
+        ]
+
+        self.board_rects = {}
+
+        self.__moves = []
+
+        self.turn = "White"
+
+        self._piece_names = ["r", "n", "b", "q", "k", "b", "n", "r"]
+
+        self.rows = ["8", "7", "6", "5", "4", "3", "2", "1"]
+        self.cols = ["A", "B", "C", "D", "E", "F", "G", "H"]
+
+        self.coords = ["".join(x) for x in product(self.cols, self.rows)]
+
+        self.__piece_images = self.__fetch_assets()
+
+        self.__board_is_shown = True
+
+        if start_flipped:
+            self.flip()
+
+    def __fetch_assets(self) -> dict:
+        piece_files = {}
+        pieces = ["wk", "wq", "wr", "wn", "wb",
+                  "wp", "bk", "bq", "br", "bn", "bb", "bp"]
+
+        if __DEBUG__:
+            print(f"[INFO] Scanning {self.assets_path.capitalize()}...")
+        for path, _, files in os.walk(self.assets_path):
+            for file in files:
+                if __DEBUG__:
+                    print("\tFound:", file)
+                filename = file.split(".")[0]
+                if filename.lower() in pieces:
+                    piece_files.update(
+                        {filename.lower(): os.path.join(path, file)})
+        piece_images = {}
+
+        if __DEBUG__:
+            print("     Done")
+            print("[INFO] Processing assets...", end=" ")
+        for name, path in piece_files.items():
+            img = Image.open(path)
+            img_rszd = img.resize(
+                (self.tile_size, self.tile_size), Image.Resampling.LANCZOS)
+            img_tk = ImageTk.PhotoImage(img_rszd)
+            piece_images.update({name.upper(): img_tk})
+
+        self.root.piece_images = piece_images
+        if __DEBUG__:
+            print("Done")
+
+        return piece_images
+
+    def change_colors(self, new_white: str = "#ffcf9f", new_black: str = "#d28c45") -> bool:
+        if new_white.startswith("#") and new_black.startswith("#") and new_white != new_black and len(new_white) == 7 and len(new_black) == 7:
+            self._white = new_white
+            self._black = new_black
+            return True
+        else:
+            return False
+
+    def flip(self, draw_immediate: bool = False):
+        self._flipped = not self._flipped
+        self.board.reverse()
+        self.rows.reverse()
+        self.cols.reverse()
+        if draw_immediate:
+            self.draw()
+
+    def reset(self):
+        if self._flipped:
+            self.flip()
+        self.board = [
+            ["BR", "BN", "BB", "BQ", "BK", "BB", "BN", "BR"],
+            ["BP", "BP", "BP", "BP", "BP", "BP", "BP", "BP"],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["WP", "WP", "WP", "WP", "WP", "WP", "WP", "WP"],
+            ["WR", "WN", "WB", "WQ", "WK", "WB", "WN", "WR"]
+        ]
+        self.__moves = []
+
+        self.canvas.delete("all")
+
+        for row in range(8):
+            for col in range(8):
+                color = self._colors[(row + col) % 2]
+                x1, y1 = col * self.tile_size, row * self.tile_size
+                x2, y2 = x1 + self.tile_size, y1 + self.tile_size
+                rect = self.canvas.create_rectangle(
+                    x1, y1, x2, y2, fill=color, outline="")
+                self.board_rects[f"{row},{col}"] = rect
+
+        for row, line in enumerate(self.board):
+            for col, cell in enumerate(line):
+                if cell != "  ":
+                    self.canvas.create_image(
+                        30 + col * self.tile_size, 30 + row * self.tile_size, image=self.__piece_images[cell], tags="piece")
+
+    def update(self):
+        self.canvas.delete("piece")
+        for row, line in enumerate(self.board):
+            for col, cell in enumerate(line):
+                if cell != "  ":
+                    self.canvas.create_image(
+                        30 + col * self.tile_size, 30 + row * self.tile_size, image=self.__piece_images[cell], tags="piece")
+
+    def draw(self):
+        self.canvas.delete("all")
+
+        for row in range(8):
+            for col in range(8):
+                color = self._colors[(row + col) % 2]
+                x1, y1 = col * self.tile_size, row * self.tile_size
+                x2, y2 = x1 + self.tile_size, y1 + self.tile_size
+                rect = self.canvas.create_rectangle(
+                    x1, y1, x2, y2, fill=color, outline="")
+                self.board_rects[f"{row},{col}"] = rect
+
+        for row, line in enumerate(self.board):
+            for col, cell in enumerate(line):
+                if cell != "  ":
+                    piece_x = (0.5 * self.tile_size) + col * self.tile_size
+                    piece_y = (0.5 * self.tile_size) + row * self.tile_size
+                    self.canvas.create_image(
+                        piece_x, piece_y, image=self.__piece_images[cell], tags="piece")
+                # if row == 7:
+                #     text_x = self.tile_size + col * self.tile_size
+                #     text_y = self.tile_size + row * self.tile_size
+                #     self.canvas.create_text(text_x, text_y, text=self.cols[col], font=(
+                #         "Arial", 8, "bold"), fill="gray")
+                # if col == 0:
+                #     text_x = col * self.tile_size
+                #     text_y = row * self.tile_size
+                #     self.canvas.create_text(text_x, text_y, text=self.rows[row], font=(
+                #         "Arial", 8, "bold"), fill="gray")
+
+    def hide(self):
+        if self.__board_is_shown:
+            self.__board_is_shown = False
+            self.canvas.pack_forget()
+
+    def show(self):
+        if not self.__board_is_shown:
+            self.__board_is_shown = True
+            self.canvas.pack()
+
+    def get_moves(self) -> tuple:
+        return tuple(self.__moves)
+
+    def get_possible_moves(self, cell: str):
+        if cell.upper() not in self.coords:
+            print(self.coords)
+            print(cell.upper())
+            print("Cell not in coords")
+            return None
+
+        moves = []
+
+        row = self.rows.index(cell[1].upper())
+        col = self.cols.index(cell[0].upper())
+        piece = self.board[row][col].lower()
+        print(piece)
+        piece_color = piece[0]
+        piece_type = piece[1]
+
+        match piece_type:
+            case " ":
+                return None
+            case "p":
+                if piece_color == "w":
+                    if self.board[row - 1][col] == "  ":
+                        moves.append(
+                            f"{self.cols[col]}{self.rows[row - 1]}".lower())
+                        if row == 6 and self.board[row - 2][col] == "  ":
+                            moves.append(
+                                f"{self.cols[col]}{self.rows[row - 2]}".lower())
+                    if col != 0:
+                        if self.board[row - 1][col - 1] != "  ":
+                            moves.append(
+                                f"{self.cols[col]}x{self.cols[col - 1]}{self.rows[row - 1]}".lower())
+                    if col != 7:
+                        if self.board[row - 1][col + 1] != "  ":
+                            moves.append(
+                                f"{self.cols[col]}x{self.cols[col + 1]}{self.rows[row - 1]}".lower())
+
+        return moves
+
+
+def main():
+    root = tk.Tk()
+    root.title("PyChess")
+    root.iconbitmap(icon_path)
+    root.geometry("600x485")
+    root.minsize(485, 485)
+
+    board = ChessBoard(root, assets_dir)
+    board.draw()
+    print(board.get_possible_moves("a2"))
+    print(board.get_possible_moves("b2"))
+    print(board.get_possible_moves("c2"))
+
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
