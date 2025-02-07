@@ -247,10 +247,10 @@ class ChessBoard:
                         moves.append(
                             col + row + col + self.rows[row_idx - 1])
 
-                    if row_idx == 6:
-                        if self.__is_empty(row_idx - 2, col_idx):
-                            moves.append(
-                                col + row + col + self.rows[row_idx - 2])
+                        if row_idx == 6:
+                            if self.__is_empty(row_idx - 2, col_idx):
+                                moves.append(
+                                    col + row + col + self.rows[row_idx - 2])
 
                     if col_idx > 0:
                         if not self.__is_empty(row_idx - 1, col_idx - 1) and self.__get_color(row_idx - 1, col_idx - 1) != piece_color:
@@ -266,10 +266,10 @@ class ChessBoard:
                         moves.append(
                             col + row + col + self.rows[row_idx + 1])
 
-                    if row_idx == 1:
-                        if self.__is_empty(row_idx + 2, col_idx):
-                            moves.append(
-                                col + row + col + self.rows[row_idx + 2])
+                        if row_idx == 1:
+                            if self.__is_empty(row_idx + 2, col_idx):
+                                moves.append(
+                                    col + row + col + self.rows[row_idx + 2])
 
                     if col_idx > 0:
                         if not self.__is_empty(row_idx + 1, col_idx - 1) and self.__get_color(row_idx + 1, col_idx - 1) != piece_color:
