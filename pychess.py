@@ -66,7 +66,7 @@ class ChessBoard:
             ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
             ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
             ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "BP", "  ", "  ", "  ", "  ", "  ", "  "],
             ["WP", "WP", "WP", "WP", "WP", "WP", "WP", "WP"],
             ["WR", "WN", "WB", "WQ", "WK", "WB", "WN", "WR"]
         ]
@@ -231,11 +231,12 @@ class ChessBoard:
 
         row_idx = self.rows.index(cell[1].upper())
         col_idx = self.cols.index(cell[0].upper())
-        row = cell[1].lower()
-        col = cell[1].lower()
+        row = cell[1]
+        col = cell[0].lower()
         piece = self.board[row_idx][col_idx].lower()
         piece_color = piece[0].lower()
         piece_type = piece[1]
+        print(piece, cell, str(col_idx) + str(row_idx), end=": ")
 
         match piece_type:
             case " ":
@@ -244,50 +245,51 @@ class ChessBoard:
                 if piece_color == "w":
                     if self.__is_empty(row_idx - 1, col_idx):
                         moves.append(
-                            col, row, self.cols[col_idx], self.rows[row_idx - 1], sep="")
+                            col + row + col + self.rows[row_idx - 1])
 
-                    if col_idx == 6:
+                    if row_idx == 6:
                         if self.__is_empty(row_idx - 2, col_idx):
                             moves.append(
-                                col, row, self.cols[col_idx], self.rows[row_idx - 2], sep="")
+                                col + row + col + self.rows[row_idx - 2])
 
                     if col_idx > 0:
                         if not self.__is_empty(row_idx - 1, col_idx - 1) and self.__get_color(row_idx - 1, col_idx - 1) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx - 1], self.rows[row_idx - 1])
+                                col + row + self.cols[col_idx - 1] + row)
 
                     if col_idx < 7:
                         if not self.__is_empty(row_idx - 1, col_idx + 1) and self.__get_color(row_idx - 1, col_idx - 1) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx + 1], self.rows[row_idx - 1])
+                                col + row + self.cols[col_idx + 1] + self.rows[row_idx - 1])
                 else:
                     if self.__is_empty(row_idx + 1, col_idx):
                         moves.append(
-                            col, row, self.cols[col_idx], self.rows[row_idx + 1], sep="")
+                            col + row + col + self.rows[row_idx + 1])
 
-                    if col_idx == 1:
+                    if row_idx == 1:
                         if self.__is_empty(row_idx + 2, col_idx):
                             moves.append(
-                                col, row, self.cols[col_idx], self.rows[row_idx + 2], sep="")
+                                col + row + col + self.rows[row_idx + 2])
 
                     if col_idx > 0:
                         if not self.__is_empty(row_idx + 1, col_idx - 1) and self.__get_color(row_idx + 1, col_idx - 1) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx - 1], self.rows[row_idx + 1])
+                                col + row + self.cols[col_idx - 1] + self.rows[row_idx + 1])
 
                     if col_idx < 7:
                         if not self.__is_empty(row_idx + 1, col_idx + 1) and self.__get_color(row_idx + 1, col_idx - 1) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx + 1], self.rows[row_idx + 1])
+                                col + row + self.cols[col_idx + 1] + self.rows[row_idx + 1])
 
             case "r":
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx + m, col_idx):
-                            moves.append(col, row, col, self.rows[row_idx + m])
+                            moves.append(col + row + col +
+                                         self.rows[row_idx + m])
                         elif self.__get_color(row_idx + m, col_idx) != piece_color:
                             moves.append(moves.append(
-                                col, row, col, self.rows[row_idx + m]))
+                                col + row + col + self.rows[row_idx + m]))
                             break
                     except IndexError:
                         break
@@ -295,10 +297,11 @@ class ChessBoard:
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx - m, col_idx):
-                            moves.append(col, row, col, self.rows[row_idx - m])
+                            moves.append(col + row + col +
+                                         self.rows[row_idx - m])
                         elif self.__get_color(row_idx - m, col_idx) != piece_color:
                             moves.append(moves.append(
-                                col, row, col, self.rows[row_idx - m]))
+                                col + row + col + self.rows[row_idx - m]))
                             break
                     except IndexError:
                         break
@@ -306,9 +309,11 @@ class ChessBoard:
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx, col_idx + m):
-                            moves.append(col, row, self.cols[col_idx + m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx + m] + row)
                         elif self.__get_color(row_idx, col_idx + m) != piece_color:
-                            moves.append(col, row, self.cols[col_idx + m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx + m] + row)
                             break
                     except IndexError:
                         break
@@ -316,9 +321,11 @@ class ChessBoard:
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx, col_idx - m):
-                            moves.append(col, row, self.cols[col_idx - m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx - m] + row)
                         elif self.__get_color(row_idx, col_idx - m) != piece_color:
-                            moves.append(col, row, self.cols[col_idx - m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx - m] + row)
                             break
                     except IndexError:
                         break
@@ -328,10 +335,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx + m, col_idx + m):
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx + m])
                         elif self.__get_color(row_idx + m, col_idx + m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx + m])
                             break
                     except IndexError:
                         break
@@ -340,10 +347,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx - m, col_idx + m):
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx - m])
                         elif self.__get_color(row_idx - m, col_idx + m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx - m])
                             break
                     except IndexError:
                         break
@@ -352,10 +359,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx + m, col_idx - m):
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx + m])
                         elif self.__get_color(row_idx + m, col_idx - m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx + m])
                             break
                     except IndexError:
                         break
@@ -364,10 +371,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx - m, col_idx - m):
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx - m])
                         elif self.__get_color(row_idx - m, col_idx - m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx - m])
                             break
                     except IndexError:
                         break
@@ -377,10 +384,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx + m, col_idx + m):
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx + m])
                         elif self.__get_color(row_idx + m, col_idx + m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx + m])
                             break
                     except IndexError:
                         break
@@ -389,10 +396,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx - m, col_idx + m):
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx - m])
                         elif self.__get_color(row_idx - m, col_idx + m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx + m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx + m] + self.rows[row_idx - m])
                             break
                     except IndexError:
                         break
@@ -401,10 +408,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx + m, col_idx - m):
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx + m])
                         elif self.__get_color(row_idx + m, col_idx - m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx + m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx + m])
                             break
                     except IndexError:
                         break
@@ -413,10 +420,10 @@ class ChessBoard:
                     try:
                         if self.__is_empty(row_idx - m, col_idx - m):
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx - m])
                         elif self.__get_color(row_idx - m, col_idx - m) != piece_color:
                             moves.append(
-                                col, row, self.cols[col_idx - m], self.rows[row_idx - m])
+                                col + row + self.cols[col_idx - m] + self.rows[row_idx - m])
                             break
                     except IndexError:
                         break
@@ -424,10 +431,11 @@ class ChessBoard:
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx + m, col_idx):
-                            moves.append(col, row, col, self.rows[row_idx + m])
+                            moves.append(col + row + col +
+                                         self.rows[row_idx + m])
                         elif self.__get_color(row_idx + m, col_idx) != piece_color:
                             moves.append(moves.append(
-                                col, row, col, self.rows[row_idx + m]))
+                                col + row + col + self.rows[row_idx + m]))
                             break
                     except IndexError:
                         break
@@ -435,10 +443,11 @@ class ChessBoard:
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx - m, col_idx):
-                            moves.append(col, row, col, self.rows[row_idx - m])
+                            moves.append(col + row + col +
+                                         self.rows[row_idx - m])
                         elif self.__get_color(row_idx - m, col_idx) != piece_color:
                             moves.append(moves.append(
-                                col, row, col, self.rows[row_idx - m]))
+                                col + row + col + self.rows[row_idx - m]))
                             break
                     except IndexError:
                         break
@@ -446,9 +455,11 @@ class ChessBoard:
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx, col_idx + m):
-                            moves.append(col, row, self.cols[col_idx + m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx + m] + row)
                         elif self.__get_color(row_idx, col_idx + m) != piece_color:
-                            moves.append(col, row, self.cols[col_idx + m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx + m] + row)
                             break
                     except IndexError:
                         break
@@ -456,9 +467,11 @@ class ChessBoard:
                 for m in range(8):
                     try:
                         if self.__is_empty(row_idx, col_idx - m):
-                            moves.append(col, row, self.cols[col_idx - m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx - m] + row)
                         elif self.__get_color(row_idx, col_idx - m) != piece_color:
-                            moves.append(col, row, self.cols[col_idx - m], row)
+                            moves.append(
+                                col + row + self.cols[col_idx - m] + row)
                             break
                     except IndexError:
                         break
@@ -466,6 +479,7 @@ class ChessBoard:
             case _:
                 return None
 
+        moves = [x.lower() for x in moves]
         return moves
 
     def __is_empty(self, row: int, col: int):
@@ -475,9 +489,9 @@ class ChessBoard:
             return False
 
     def __get_color(self, row: int, col: int):
-        if self.board[row][col].startswith() == "W":
+        if self.board[row][col].startswith("W"):
             return "w"
-        elif self.board[row][col].startswith() == "B":
+        elif self.board[row][col].startswith("B"):
             return "b"
 
 
