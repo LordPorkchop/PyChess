@@ -1,6 +1,3 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
 title: Stockfish
 message: >-
@@ -8,7 +5,7 @@ message: >-
   file.
 type: software
 authors:
-  - name: The Stockfish developers (see AUTHORS file)
+  - name: The Stockfish developers (see stockfish/Stockfish Authors file)
 repository-code: 'https://github.com/official-stockfish/Stockfish'
 url: 'https://stockfishchess.org/'
 repository-artifact: 'https://stockfishchess.org/download/'
