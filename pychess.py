@@ -222,7 +222,7 @@ class ChessBoard:
     def get_moves(self) -> tuple:
         return tuple(self.__moves)
 
-    def get_possible_moves(self, cell: str):
+    def get_possible_moves(self, cell: str) -> list:
         if cell.upper() not in self.coords:
             raise UnknownCoordinatesError(
                 f"{cell} is not a valid coordinate pair. Please use any from A1 to H8")
@@ -368,6 +368,97 @@ class ChessBoard:
                         elif self.__get_color(row_idx - m, col_idx - m) != piece_color:
                             moves.append(
                                 col, row, self.cols[col_idx - m], self.rows[row_idx - m])
+                            break
+                    except IndexError:
+                        break
+
+            case "q":
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx + m, col_idx + m):
+                            moves.append(
+                                col, row, self.cols[col_idx + m], self.rows[row_idx + m])
+                        elif self.__get_color(row_idx + m, col_idx + m) != piece_color:
+                            moves.append(
+                                col, row, self.cols[col_idx + m], self.rows[row_idx + m])
+                            break
+                    except IndexError:
+                        break
+
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx - m, col_idx + m):
+                            moves.append(
+                                col, row, self.cols[col_idx + m], self.rows[row_idx - m])
+                        elif self.__get_color(row_idx - m, col_idx + m) != piece_color:
+                            moves.append(
+                                col, row, self.cols[col_idx + m], self.rows[row_idx - m])
+                            break
+                    except IndexError:
+                        break
+
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx + m, col_idx - m):
+                            moves.append(
+                                col, row, self.cols[col_idx - m], self.rows[row_idx + m])
+                        elif self.__get_color(row_idx + m, col_idx - m) != piece_color:
+                            moves.append(
+                                col, row, self.cols[col_idx - m], self.rows[row_idx + m])
+                            break
+                    except IndexError:
+                        break
+
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx - m, col_idx - m):
+                            moves.append(
+                                col, row, self.cols[col_idx - m], self.rows[row_idx - m])
+                        elif self.__get_color(row_idx - m, col_idx - m) != piece_color:
+                            moves.append(
+                                col, row, self.cols[col_idx - m], self.rows[row_idx - m])
+                            break
+                    except IndexError:
+                        break
+
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx + m, col_idx):
+                            moves.append(col, row, col, self.rows[row_idx + m])
+                        elif self.__get_color(row_idx + m, col_idx) != piece_color:
+                            moves.append(moves.append(
+                                col, row, col, self.rows[row_idx + m]))
+                            break
+                    except IndexError:
+                        break
+
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx - m, col_idx):
+                            moves.append(col, row, col, self.rows[row_idx - m])
+                        elif self.__get_color(row_idx - m, col_idx) != piece_color:
+                            moves.append(moves.append(
+                                col, row, col, self.rows[row_idx - m]))
+                            break
+                    except IndexError:
+                        break
+
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx, col_idx + m):
+                            moves.append(col, row, self.cols[col_idx + m], row)
+                        elif self.__get_color(row_idx, col_idx + m) != piece_color:
+                            moves.append(col, row, self.cols[col_idx + m], row)
+                            break
+                    except IndexError:
+                        break
+
+                for m in range(8):
+                    try:
+                        if self.__is_empty(row_idx, col_idx - m):
+                            moves.append(col, row, self.cols[col_idx - m], row)
+                        elif self.__get_color(row_idx, col_idx - m) != piece_color:
+                            moves.append(col, row, self.cols[col_idx - m], row)
                             break
                     except IndexError:
                         break
