@@ -12,6 +12,16 @@ save_dir = os.path.join(os.path.dirname(__file__), "games")
 icon_path = os.path.join(assets_dir, "icon.ico")
 
 
+class UnknownPieceError(Exception):
+    def __init__(self, msg: str, **kwargs):
+        super.__init__(message=msg, **kwargs)
+
+
+class UnknownCoordinatesError(Exception):
+    def __init__(self, msg: str, **kwargs):
+        super.__init__(message=msg, **kwargs)
+
+
 class ChessEngine(stockfish.Stockfish):
     def __init__(self):
         super.__init__(path=stockfish_path)
