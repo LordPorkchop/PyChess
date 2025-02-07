@@ -222,7 +222,7 @@ class ChessBoard:
     def get_moves(self) -> tuple:
         return tuple(self.__moves)
 
-    def get_possible_moves(self, cell: str) -> list:
+    def get_legal_moves(self, cell: str) -> list:
         if cell.upper() not in self.coords:
             raise UnknownCoordinatesError(
                 f"{cell} is not a valid coordinate pair. Please use any from A1 to H8")
@@ -504,9 +504,9 @@ def main():
 
     board = ChessBoard(root, assets_dir)
     board.draw()
-    print(board.get_possible_moves("a2"))
-    print(board.get_possible_moves("b2"))
-    print(board.get_possible_moves("c2"))
+    print(board.get_legal_moves("a2"))
+    print(board.get_legal_moves("b2"))
+    print(board.get_legal_moves("c2"))
 
     root.mainloop()
 
