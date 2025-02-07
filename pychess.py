@@ -11,9 +11,16 @@ if len(sys.argv) > 1:
     __DEBUG__ = True
 
 
+stockfish_path = os.path.join(os.path.dirname(
+    __file__), "stockfish", "stockfish.exe")
 assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 save_dir = os.path.join(os.path.dirname(__file__), "games")
 icon_path = os.path.join(assets_dir, "icon.ico")
+
+
+class ChessEngine(stockfish.Stockfish):
+    def __init__(self):
+        super.__init__(path=stockfish_path)
 
 
 class ChessBoard:
