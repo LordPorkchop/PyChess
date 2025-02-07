@@ -224,17 +224,16 @@ class ChessBoard:
 
     def get_possible_moves(self, cell: str):
         if cell.upper() not in self.coords:
-            print(self.coords)
-            print(cell.upper())
-            print("Cell not in coords")
-            return None
+            raise UnknownCoordinatesError(
+                f"{cell} is not a valid coordinate pair. Please use any from A1 to H8")
 
         moves = []
 
-        row = self.rows.index(cell[1].upper())
-        col = self.cols.index(cell[0].upper())
-        piece = self.board[row][col].lower()
-        print(piece)
+        row_idx = self.rows.index(cell[1].upper())
+        col_idx = self.cols.index(cell[0].upper())
+        row = cell[1].lower()
+        col = cell[1].lower()
+        piece = self.board[row_idx][col_idx].lower()
         piece_color = piece[0]
         piece_type = piece[1]
 
@@ -243,22 +242,57 @@ class ChessBoard:
                 return None
             case "p":
                 if piece_color == "w":
-                    if self.board[row - 1][col] == "  ":
+                    if self.__is_empty(row_idx - 1, col_idx):
                         moves.append(
-                            f"{self.cols[col]}{self.rows[row - 1]}".lower())
-                        if row == 6 and self.board[row - 2][col] == "  ":
+                            col, row, self.cols[col_idx], self.rows[row_idx - 1], sep="")
+
+                    if col_idx == 6:
+                        if self.__is_empty(row_idx - 2, col_idx):
                             moves.append(
-                                f"{self.cols[col]}{self.rows[row - 2]}".lower())
-                    if col != 0:
-                        if self.board[row - 1][col - 1] != "  ":
+                                col, row, self.cols[col_idx], self.rows[row_idx - 2], sep="")
+
+                    if col_idx > 0:
+                        if not self.__is_empty(row_idx - 1, col_idx - 1) and self.__get_color(row_idx - 1, col_idx - 1) != piece_color:
                             moves.append(
-                                f"{self.cols[col]}x{self.cols[col - 1]}{self.rows[row - 1]}".lower())
-                    if col != 7:
-                        if self.board[row - 1][col + 1] != "  ":
+                                col, row, self.cols[col_idx - 1], self.rows[row_idx - 1])
+
+                    if col_idx < 7:
+                        if not self.__is_empty(row_idx - 1, col_idx + 1) and self.__get_color(row_idx - 1, col_idx - 1) != piece_color:
                             moves.append(
-                                f"{self.cols[col]}x{self.cols[col + 1]}{self.rows[row - 1]}".lower())
+                                col, row, self.cols[col_idx + 1], self.rows[row_idx - 1])
+                else:
+                    if self.__is_empty(row_idx + 1, col_idx):
+                        moves.append(
+                            col, row, self.cols[col_idx], self.rows[row_idx + 1], sep="")
+
+                    if col_idx == 1:
+                        if self.__is_empty(row_idx + 2, col_idx):
+                            moves.append(
+                                col, row, self.cols[col_idx], self.rows[row_idx + 2], sep="")
+
+                    if col_idx > 0:
+                        if not self.__is_empty(row_idx + 1, col_idx - 1) and self.__get_color(row_idx + 1, col_idx - 1) != piece_color:
+                            moves.append(
+                                col, row, self.cols[col_idx - 1], self.rows[row_idx + 1])
+
+                    if col_idx < 7:
+                        if not self.__is_empty(row_idx + 1, col_idx + 1) and self.__get_color(row_idx + 1, col_idx - 1) != piece_color:
+                            moves.append(
+                                col, row, self.cols[col_idx + 1], self.rows[row_idx + 1])
 
         return moves
+
+    def __is_empty(self, row: int, col: int):
+        if self.board[row][col] == "  ":
+            return True
+        else:
+            return False
+
+    def __get_color(self, row: int, col: int):
+        if self.board[row][col].startswith() == "W":
+            return "w"
+        elif self.board[row][col].startswith() == "B":
+            return "b"
 
 
 def main():
