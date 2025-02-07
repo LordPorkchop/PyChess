@@ -279,6 +279,8 @@ class ChessBoard:
                         if not self.__is_empty(row_idx + 1, col_idx + 1) and self.__get_color(row_idx + 1, col_idx - 1) != piece_color:
                             moves.append(
                                 col, row, self.cols[col_idx + 1], self.rows[row_idx + 1])
+            case _:
+                return None
 
         return moves
 
