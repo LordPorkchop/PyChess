@@ -157,6 +157,15 @@ class ChessBoard:
                     x1, y1, x2, y2, fill=color, outline="")
                 self.board_rects[f"{row},{col}"] = rect
 
+                text_color = self._white if color == self._black else self._black
+
+                if row == 7:
+                    self.canvas.create_text(x1 + self.tile_size - 1, y1 + self.tile_size - 1, text=chr(
+                        97 + col).upper(), anchor="se", font=("Arial", 8, "bold"), fill=text_color)
+                if col == 0:
+                    self.canvas.create_text(
+                        x1 + 3, y1 + 3, text=str(8 - row), anchor="nw", font=("Arial", 8, "bold"), fill=text_color)
+
         for row, line in enumerate(self.board):
             for col, cell in enumerate(line):
                 if cell != "  ":
@@ -183,6 +192,15 @@ class ChessBoard:
                     x1, y1, x2, y2, fill=color, outline="")
                 self.board_rects[f"{row},{col}"] = rect
 
+                text_color = self._white if color == self._black else self._black
+
+                if row == 7:
+                    self.canvas.create_text(x1 + self.tile_size - 1, y1 + self.tile_size - 1, text=chr(
+                        97 + col).upper(), anchor="se", font=("Arial", 8, "bold"), fill=text_color)
+                if col == 0:
+                    self.canvas.create_text(
+                        x1 + 3, y1 + 3, text=str(8 - row), anchor="nw", font=("Arial", 8, "bold"), fill=text_color)
+
         for row, line in enumerate(self.board):
             for col, cell in enumerate(line):
                 if cell != "  ":
@@ -190,16 +208,6 @@ class ChessBoard:
                     piece_y = (0.5 * self.tile_size) + row * self.tile_size
                     self.canvas.create_image(
                         piece_x, piece_y, image=self.__piece_images[cell], tags="piece")
-                # if row == 7:
-                #     text_x = self.tile_size + col * self.tile_size
-                #     text_y = self.tile_size + row * self.tile_size
-                #     self.canvas.create_text(text_x, text_y, text=self.cols[col], font=(
-                #         "Arial", 8, "bold"), fill="gray")
-                # if col == 0:
-                #     text_x = col * self.tile_size
-                #     text_y = row * self.tile_size
-                #     self.canvas.create_text(text_x, text_y, text=self.rows[row], font=(
-                #         "Arial", 8, "bold"), fill="gray")
 
     def hide(self):
         if self.__board_is_shown:
