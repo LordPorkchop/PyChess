@@ -529,6 +529,56 @@ class ChessBoard:
                 except:
                     pass
 
+            case "n":
+                try:
+                    if self.__is_empty(row_idx - 2, col_idx + 1) or self.__get_color(row_idx - 2, col_idx + 1) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx + 1] + self.rows[row_idx - 2])
+                except:
+                    pass
+
+                try:
+                    if self.__is_empty(row_idx - 1, col_idx + 2) or self.__get_color(row_idx - 1, col_idx + 2) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx + 2] + self.rows[row_idx - 1])
+                except:
+                    pass
+
+                try:
+                    if self.__is_empty(row_idx + 1, col_idx + 2) or self.__get_color(row_idx + 1, col_idx + 2) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx + 2] + self.rows[row_idx + 1])
+                except:
+                    pass
+
+                try:
+                    if self.__is_empty(row_idx + 2, col_idx + 1) or self.__get_color(row_idx + 2, col_idx + 1) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx + 1] + self.rows[row_idx + 2])
+                except:
+                    pass
+
+                try:
+                    if self.__is_empty(row_idx + 2, col_idx - 1) or self.__get_color(row_idx + 2, col_idx - 1) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx - 1] + self.rows[row_idx + 2])
+                except:
+                    pass
+
+                try:
+                    if self.__is_empty(row_idx + 1, col_idx - 2) or self.__get_color(row_idx + 1, col_idx - 2) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx - 2] + self.rows[row_idx + 1])
+                except:
+                    pass
+
+                try:
+                    if self.__is_empty(row_idx - 1, col_idx - 2) or self.__get_color(row_idx - 1, col_idx - 2) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx - 2] + self.rows[row_idx + 1])
+                except:
+                    pass
+
             case _:
                 return None
 
