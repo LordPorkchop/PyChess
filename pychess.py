@@ -575,7 +575,14 @@ class ChessBoard:
                 try:
                     if self.__is_empty(row_idx - 1, col_idx - 2) or self.__get_color(row_idx - 1, col_idx - 2) != piece_color:
                         moves.append(
-                            col + row + self.cols[col_idx - 2] + self.rows[row_idx + 1])
+                            col + row + self.cols[col_idx - 2] + self.rows[row_idx - 1])
+                except IndexError:
+                    pass
+
+                try:
+                    if self.__is_empty(row_idx - 2, col_idx - 1) or self.__get_color(row_idx - 2, col_idx - 1) != piece_color:
+                        moves.append(
+                            col + row + self.cols[col_idx - 1] + self.rows[row_idx - 2])
                 except IndexError:
                     pass
 
@@ -607,9 +614,6 @@ def main():
 
     board = ChessBoard(root, assets_dir)
     board.draw()
-    print(board.get_legal_moves("a2"))
-    print(board.get_legal_moves("b2"))
-    print(board.get_legal_moves("c2"))
 
     root.mainloop()
 
