@@ -590,7 +590,14 @@ class ChessBoard:
                 return None
 
         moves = [x.lower() for x in moves]
-        return moves
+        moves += ["O-O", "O-O-O"]
+
+        legal_moves = []
+        for move in moves:
+            if stockfish.Stockfish(path=stockfish_path).is_move_correct(move):
+                legal_moves.append(move)
+
+        return legal_moves
 
     def __is_empty(self, row: int, col: int):
         if self.board[row][col] == "  ":
