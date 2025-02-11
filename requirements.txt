@@ -1,2 +1,4 @@
 stockfish>=3.28.0
 pillow>=11.1.0
+python-chess>=1.11.1
+customtkinter>=5.2.2
